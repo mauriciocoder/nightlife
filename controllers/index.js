@@ -3,7 +3,8 @@ var router = express.Router();
 module.exports = function(passport) {
     router.get("/", function(req, res) {
         console.log("Chegou na raiz!");
-        //res.redirect("/polls");
+        var resContent = { user: req.user, authenticated: req.isAuthenticated() };
+        res.render("home", resContent);
     });
 
     /* Handle Logout */
@@ -13,6 +14,7 @@ module.exports = function(passport) {
 	});
     router.use("/login", require("./login")(passport));
     router.use("/register", require("./register")(passport));
+    router.use("/search", require("./search")(passport));
     /*
     router.use("/polls", require("./polls")());
     router.use("/poll", require("./poll")());
