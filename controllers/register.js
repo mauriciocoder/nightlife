@@ -8,11 +8,9 @@ module.exports = function(passport) {
         failureRedirect: "/register",
         failureFlash : true  
     }));
-    
     /* Handle register GET */
     router.get("/", function(req, res) {
         res.render("register", { message: req.flash("message") });
     });
-    
     return router;
 };

@@ -1,8 +1,6 @@
 var express = require("express");
 var router = express.Router();
-//var Poll = require("../models/poll");
 
-/* require the modules needed */
 var oauthSignature = require("oauth-signature");  
 var n = require("nonce")();  
 var request = require("request");  
@@ -44,7 +42,6 @@ function callYelp(searchLocation, callback) {
     
     /* Add the query string to the url */
     var apiURL = url + '?' + paramURL;
-    console.log("url = " + apiURL);
     
     /* Then we use request to send make the API Request */
     request(apiURL, function(error, response, body) {
@@ -61,33 +58,11 @@ module.exports = function() {
             var results = JSON.parse(body);
             var resContent = { user: req.user, authenticated: req.isAuthenticated() };
             resContent.businesses = results.businesses;
-            //console.log("body = " + JSON.stringify(body));
+            var session = req.session;
+            session.businesses = resContent.businesses;
             res.render("home", resContent);
             
         });
-        //Poll.find({}, handlePollsView.bind(null, req, res));
     });
     return router;
 };
-/*
-function handlePollsView(req, res, err, polls) {
-    var resContent = { user: req.user, authenticated: req.isAuthenticated() };
-    var userPolls = [];
-    var allPolls = [];
-    if (resContent.authenticated) {
-        for (var i = 0; i < polls.length; i++) {
-            if (polls[i].author == resContent.user.id) {
-                userPolls.push(polls[i]);
-            } else {
-                allPolls.push(polls[i]);
-            }
-        }
-    } else {
-        allPolls = polls;
-    }
-    resContent.userPolls = userPolls;
-    resContent.allPolls = allPolls;
-    resContent.message = req.flash("message");
-    res.render("polls", resContent);
-}
-*/
