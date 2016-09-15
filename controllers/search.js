@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var Visitor = require("../models/visitor");
 
 var oauthSignature = require("oauth-signature");  
 var n = require("nonce")();  
@@ -7,7 +8,7 @@ var request = require("request");
 var qs = require("querystring");  
 var _ = require("lodash");
 
-function callYelp(searchLocation, callback) {
+function callYelpAPI(searchLocation, callback) {
     var httpMethod = "GET";
     var url = 'http://api.yelp.com/v2/search';
     
@@ -53,15 +54,36 @@ module.exports = function() {
     /* Handle search POST */
     router.post("/", function(req, res) {
         var town = req.body.town;
-        callYelp(town, function(error, response, body) {
+        callYelpAPI(town, function(error, response, body) {
             // TODO: Handle error response
             var results = JSON.parse(body);
             var resContent = { user: req.user, authenticated: req.isAuthenticated() };
             resContent.businesses = results.businesses;
-            var session = req.session;
-            session.businesses = resContent.businesses;
-            res.render("home", resContent);
-            
+            var pubIds = [];
+            for (var i = 0; i < resContent.businesses.length; i++) {
+                pubIds.push(resContent.businesses[i].id);
+                resContent.businesses[i].visitorsQty = 0;
+            }
+            Visitor.find({pubId : {$in : pubIds}}, function(err, visitors) {
+                if (err) {
+                    throw err;
+                }
+                if (req.isAuthenticated()) {
+                    for (var j = 0; j < visitors.length; j++) {
+                        for (var i = 0; i < resContent.businesses.length; i++) {
+                            if (resContent.businesses[i].id == visitors[j].pubId) {
+                                resContent.businesses[i].visitorsQty += 1;
+                                if (visitors[j].username == req.user.username) {
+                                    resContent.businesses[i].userIsAVisitor = true;
+                                }
+                            }
+                        }
+                    }    
+                }
+                var session = req.session;
+                session.businesses = resContent.businesses;
+                res.render("home", resContent);
+            });
         });
     });
     return router;

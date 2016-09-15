@@ -89,7 +89,7 @@
 						  <div class="row">
 							<div class="col-lg-2"><img src="{{#image_url}}{{image_url}}{{/image_url}}{{^image_url}}http://bulldogtours.com/rsite/wp-content/uploads/2016/08/pub-thumb-2.jpg{{/image_url}}" class="img-rounded" style="width:80px"/></div>
 							<div class="col-lg-9"><a style="text-decoration:none" href="{{url}}"><span><b>{{name}}</b> {{snippet_text}}</span></a></div>
-							<div class="col-lg-1">{{#authenticated}}<button class="btn btn-xs btn-primary">39 going</button>{{/authenticated}}</div>
+							<div class="col-lg-1">{{#authenticated}}<button class="btn btn-xs {{#userIsAVisitor}}btn-secondary{{/userIsAVisitor}} {{^userIsAVisitor}}btn-primary{{/userIsAVisitor}} btnGoing" data-id="{{id}}" data-visitors-qty="{{visitorsQty}}" data-user-is-a-visitor="{{userIsAVisitor}}">{{visitorsQty}} going</button>{{/authenticated}}</div>
 						  </div>
 						  </td>
 						</tr>
@@ -126,6 +126,25 @@
 				infowindow.open(null, null);
 			});
 		}
+		
+		$(".btnGoing").click(function() {
+			var userIsAVisitor = $(this).attr("data-user-is-a-visitor");
+			var visitors = parseInt($(this).attr("data-visitors-qty"));
+			alert("userIsAVisitor = " + userIsAVisitor);
+			if (userIsAVisitor) {
+				visitors--;
+				$(this).attr("data-user-is-a-visitor", null);
+				$(this).addClass("btn-primary");
+				$(this).removeClass("btn-secondary");
+			} else {
+				visitors++;
+				$(this).attr("data-user-is-a-visitor", true);
+				$(this).addClass("btn-secondary");
+				$(this).removeClass("btn-primary");
+			}
+			$(this).attr("data-visitors-qty", visitors);
+			$(this).html(visitors + " going");
+		});
 	</script>
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBW8dmTjdmfb2isQA9yO2x-NWmWI8zHpsA&cx=008167733778276982844:_ybjsd3ch4m&signed_in=true&libraries=places&callback=initGoogleAPI" async defer></script>
 </body>

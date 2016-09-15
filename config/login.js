@@ -27,6 +27,9 @@ function login(req, username, password, done, err, user) {
         console.log("Invalid Password!");
         return done(null, false, req.flash("message", "Invalid Password"));
     }
+    // Just clean search history
+    var session = req.session;
+    session.businesses = undefined;
     return done(null, user);
 }
 
