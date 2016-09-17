@@ -127,20 +127,43 @@
 			});
 		}
 		
+		function switchButtonStyle(element, newStyle, oldStyle) {
+			$(element).addClass(newStyle);
+			$(element).removeClass(oldStyle);
+		}
+		
+		function callVisitorAPI(add, pubId) {
+			var username = "{{{user.username}}}";
+			var baseUrl = document.location.protocol + "/" + document.location.hostname + "/visitor/";
+			document.domain = document.location.hostname;
+			var sufix = "visitor/";
+			if (add) {
+				sufix += "add";
+			} else {
+				sufix += "remove";
+			}
+			$.post(sufix, { "username": username, "pubId": pubId}, 
+				function(returnedData) {
+				console.log(returnedData);
+			}).fail(function() {
+				console.log("error");
+			});
+		}
+		
 		$(".btnGoing").click(function() {
 			var userIsAVisitor = $(this).attr("data-user-is-a-visitor");
 			var visitors = parseInt($(this).attr("data-visitors-qty"));
-			alert("userIsAVisitor = " + userIsAVisitor);
+			var pubId = $(this).attr("data-id");
 			if (userIsAVisitor) {
 				visitors--;
 				$(this).attr("data-user-is-a-visitor", null);
-				$(this).addClass("btn-primary");
-				$(this).removeClass("btn-secondary");
+				switchButtonStyle(this, "btn-primary", "btn-secondary");
+				callVisitorAPI(false, pubId);
 			} else {
 				visitors++;
 				$(this).attr("data-user-is-a-visitor", true);
-				$(this).addClass("btn-secondary");
-				$(this).removeClass("btn-primary");
+				switchButtonStyle(this, "btn-secondary", "btn-primary");
+				callVisitorAPI(true, pubId);
 			}
 			$(this).attr("data-visitors-qty", visitors);
 			$(this).html(visitors + " going");
