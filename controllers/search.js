@@ -58,6 +58,13 @@ module.exports = function() {
             // TODO: Handle error response
             var results = JSON.parse(body);
             var resContent = { user: req.user, authenticated: req.isAuthenticated() };
+            // TODO: UNAVAILABLE_FOR_LOCATION
+            if (results.error) {
+                if (results.error.id === "UNAVAILABLE_FOR_LOCATION") {
+                    req.flash("message", "We ain't got data for this town yet");
+                    return res.redirect("/");
+                }
+            }
             resContent.businesses = results.businesses;
             var pubIds = [];
             for (var i = 0; i < resContent.businesses.length; i++) {

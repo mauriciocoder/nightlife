@@ -5,6 +5,7 @@ module.exports = function(passport) {
         var resContent = { user: req.user, authenticated: req.isAuthenticated() };
         var session = req.session;
         resContent.businesses = session.businesses;
+        resContent.message = req.flash("message");
         res.render("home", resContent);
     });
     /* Handle Logout */
